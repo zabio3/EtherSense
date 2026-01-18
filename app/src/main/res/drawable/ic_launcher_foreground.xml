@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Background circle -->
+    <path
+        android:fillColor="#FF0D0D1A"
+        android:pathData="M54,54m-50,0a50,50 0,1 1,100 0a50,50 0,1 1,-100 0" />
+
+    <!-- Outer signal ring -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FF00D9FF"
+        android:strokeWidth="2"
+        android:pathData="M54,54m-35,0a35,35 0,1 1,70 0a35,35 0,1 1,-70 0" />
+
+    <!-- Middle signal ring -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FF00D9FF"
+        android:strokeWidth="2"
+        android:strokeAlpha="0.7"
+        android:pathData="M54,54m-25,0a25,25 0,1 1,50 0a25,25 0,1 1,-50 0" />
+
+    <!-- Inner signal ring -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FF00D9FF"
+        android:strokeWidth="2"
+        android:strokeAlpha="0.5"
+        android:pathData="M54,54m-15,0a15,15 0,1 1,30 0a15,15 0,1 1,-30 0" />
+
+    <!-- Center dot -->
+    <path
+        android:fillColor="#FF00D9FF"
+        android:pathData="M54,54m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0" />
+
+</vector>

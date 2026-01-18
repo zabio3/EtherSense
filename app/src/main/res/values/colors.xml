@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Colors -->
+    <color name="cyan_primary">#FF00D9FF</color>
+    <color name="cyan_light">#FF4DE8FF</color>
+    <color name="cyan_dark">#FF00A3C4</color>
+
+    <!-- Secondary Colors -->
+    <color name="purple_secondary">#FF9C27B0</color>
+    <color name="purple_light">#FFCE93D8</color>
+    <color name="purple_dark">#FF7B1FA2</color>
+
+    <!-- Signal Quality Colors -->
+    <color name="signal_excellent">#FF4CAF50</color>
+    <color name="signal_good">#FF8BC34A</color>
+    <color name="signal_fair">#FFFFC107</color>
+    <color name="signal_poor">#FFFF9800</color>
+    <color name="signal_weak">#FFF44336</color>
+
+    <!-- Background Colors -->
+    <color name="background_dark">#FF0D0D1A</color>
+    <color name="surface_dark">#FF1A1A2E</color>
+    <color name="surface_variant">#FF252540</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#FFFFFFFF</color>
+    <color name="text_secondary">#FFB0B0C0</color>
+    <color name="text_tertiary">#FF707080</color>
+</resources>
