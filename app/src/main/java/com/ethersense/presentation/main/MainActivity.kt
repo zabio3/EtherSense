@@ -38,6 +38,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ethersense.presentation.dashboard.DashboardEvent
 import com.ethersense.presentation.dashboard.DashboardScreen
 import com.ethersense.presentation.dashboard.DashboardViewModel
+import com.ethersense.presentation.diagnostics.DiagnosticsScreen
 import com.ethersense.presentation.settings.SettingsScreen
 import com.ethersense.presentation.speedtest.SpeedTestScreen
 import com.ethersense.ui.theme.CyanPrimary
@@ -70,6 +71,7 @@ sealed class Screen(
 ) {
     data object Dashboard : Screen("dashboard", "Wi-Fi", "Wi-Fi", Icons.Default.Wifi)
     data object SpeedTest : Screen("speedtest", "Speed", "速度", Icons.Default.Speed)
+    data object Diagnostics : Screen("diagnostics", "Diagnose", "診断", Icons.Default.Analytics)
     data object Settings : Screen("settings", "Settings", "設定", Icons.Default.Settings)
 
     fun getTitle(isJapanese: Boolean): String = if (isJapanese) titleJa else titleEn
@@ -78,6 +80,7 @@ sealed class Screen(
 private val bottomNavItems = listOf(
     Screen.Dashboard,
     Screen.SpeedTest,
+    Screen.Diagnostics,
     Screen.Settings
 )
 
@@ -144,6 +147,10 @@ fun EtherSenseApp() {
 
                 composable(Screen.SpeedTest.route) {
                     SpeedTestScreen()
+                }
+
+                composable(Screen.Diagnostics.route) {
+                    DiagnosticsScreen()
                 }
 
                 composable(Screen.Settings.route) {

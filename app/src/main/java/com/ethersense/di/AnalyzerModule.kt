@@ -1,6 +1,11 @@
 package com.ethersense.di
 
 import com.ethersense.domain.analyzer.ChannelAnalyzer
+import com.ethersense.domain.analyzer.DistanceEstimator
+import com.ethersense.domain.analyzer.LinkMarginAnalyzer
+import com.ethersense.domain.analyzer.NetworkDiagnosticsAnalyzer
+import com.ethersense.domain.analyzer.ScientificThroughputPredictor
+import com.ethersense.domain.analyzer.SignalPredictor
 import com.ethersense.domain.analyzer.SignalQualityCalculator
 import com.ethersense.domain.analyzer.ThroughputEstimator
 import com.ethersense.domain.analyzer.WifiAnalyzerEngine
@@ -43,6 +48,52 @@ object AnalyzerModule {
             signalQualityCalculator,
             channelAnalyzer,
             throughputEstimator
+        )
+    }
+
+    // New Scientific Diagnostic Analyzers
+
+    @Provides
+    @Singleton
+    fun provideDistanceEstimator(): DistanceEstimator {
+        return DistanceEstimator()
+    }
+
+    @Provides
+    @Singleton
+    fun provideScientificThroughputPredictor(): ScientificThroughputPredictor {
+        return ScientificThroughputPredictor()
+    }
+
+    @Provides
+    @Singleton
+    fun provideLinkMarginAnalyzer(): LinkMarginAnalyzer {
+        return LinkMarginAnalyzer()
+    }
+
+    @Provides
+    @Singleton
+    fun provideSignalPredictor(
+        signalQualityCalculator: SignalQualityCalculator
+    ): SignalPredictor {
+        return SignalPredictor(signalQualityCalculator)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNetworkDiagnosticsAnalyzer(
+        distanceEstimator: DistanceEstimator,
+        throughputPredictor: ScientificThroughputPredictor,
+        linkMarginAnalyzer: LinkMarginAnalyzer,
+        signalPredictor: SignalPredictor,
+        signalQualityCalculator: SignalQualityCalculator
+    ): NetworkDiagnosticsAnalyzer {
+        return NetworkDiagnosticsAnalyzer(
+            distanceEstimator,
+            throughputPredictor,
+            linkMarginAnalyzer,
+            signalPredictor,
+            signalQualityCalculator
         )
     }
 }
