@@ -1,6 +1,6 @@
 # EtherSense
 
-Wi-Fiネットワーク診断アプリ
+Wi-Fi Network Diagnostics App
 
 <p align="center">
   <img src="docs/images/wifi.png" width="280" alt="EtherSense Wi-Fi Dashboard">
@@ -8,40 +8,40 @@ Wi-Fiネットワーク診断アプリ
 
 ## Features
 
-### リアルタイム信号モニタリング
-接続中のWi-Fiの信号強度(RSSI)、リンク速度、推定スループット、チャンネル干渉をリアルタイムで表示します。
+### Real-time Signal Monitoring
+Displays signal strength (RSSI), link speed, estimated throughput, and channel interference for your connected Wi-Fi in real-time.
 
-### スピードテスト
-ダウンロード/アップロード速度とレイテンシを測定。動画視聴、オンラインゲーム、ビデオ通話への適性も判定します。
+### Speed Test
+Measures download/upload speeds and latency. Also evaluates suitability for video streaming, online gaming, and video calls.
 
-### ネットワーク診断
+### Network Diagnostics
 
-#### 距離推定 (ITU-R P.1238)
-ITU（国際電気通信連合）の屋内電波伝搬モデルを使用して、RSSIからルーターまでの推定距離を算出します。住宅、オフィス、商業施設など環境タイプに応じた経路損失係数を適用。
+#### Distance Estimation (ITU-R P.1238)
+Estimates the distance to your router from RSSI using the ITU indoor radio propagation model. Applies path loss coefficients based on environment type (residential, office, commercial).
 
-#### スループット予測 (Shannon-Hartley)
-Shannon-Hartley定理による理論上の最大通信容量と、IEEE 802.11 MCSテーブルに基づく実効スループットを予測します。
+#### Throughput Prediction (Shannon-Hartley)
+Predicts theoretical maximum channel capacity using the Shannon-Hartley theorem and real-world throughput based on IEEE 802.11 MCS tables.
 
-#### リンクマージン分析
-受信感度とRSSIの差分からリンクマージンを計算し、接続の安定性を評価します（Excellent >20dB / Good >12dB / Marginal >6dB / Unstable）。
+#### Link Margin Analysis
+Calculates link margin from the difference between receiver sensitivity and RSSI to evaluate connection stability (Excellent >20dB / Good >12dB / Marginal >6dB / Unstable).
 
-#### 信号トレンド予測
-過去のRSSI履歴から移動平均と線形回帰を用いて、近い将来の信号品質を予測します。
+#### Signal Trend Prediction
+Uses moving averages and linear regression on historical RSSI data to predict near-future signal quality.
 
 ## Download
 
-[GitHub Releases](https://github.com/zabio3/EtherSense/releases) からAPKをダウンロードできます。
+Download the APK from [GitHub Releases](https://github.com/zabio3/EtherSense/releases).
 
 ## Screenshots
 
-| スピードテスト | 診断 | 設定 |
+| Speed Test | Diagnostics | Settings |
 |:---:|:---:|:---:|
 | ![Speed Test](docs/images/speedtest.png) | ![Diagnostics](docs/images/diagnostics.png) | ![Settings](docs/images/settings.png) |
 
 ## Privacy
 
-- すべての処理はデバイス上でローカルに実行
-- データはサーバーに送信されません
+- All processing runs locally on the device
+- No data is sent to servers
 
 ## Build
 
@@ -49,4 +49,4 @@ Shannon-Hartley定理による理論上の最大通信容量と、IEEE 802.11 MC
 ./gradlew assembleDebug
 ```
 
-Android 8.0 (API 26) 以上が必要です。
+Requires Android 8.0 (API 26) or higher.
