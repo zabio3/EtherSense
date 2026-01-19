@@ -3,6 +3,7 @@ package com.ethersense.presentation.diagnostics
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ethersense.data.model.WifiNetwork
+import com.ethersense.data.repository.AppLanguage
 import com.ethersense.data.repository.SettingsRepository
 import com.ethersense.domain.analyzer.DistanceEstimator
 import com.ethersense.domain.analyzer.NetworkDiagnosticsAnalyzer
@@ -52,8 +53,8 @@ class DiagnosticsViewModel @Inject constructor(
 
     private fun loadSettings() {
         viewModelScope.launch {
-            settingsRepository.isJapanese.collect { isJapanese ->
-                _uiState.update { it.copy(isJapanese = isJapanese) }
+            settingsRepository.language.collect { language ->
+                _uiState.update { it.copy(isJapanese = language == AppLanguage.JAPANESE) }
             }
         }
     }
