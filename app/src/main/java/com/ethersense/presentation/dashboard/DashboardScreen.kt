@@ -5,6 +5,11 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -19,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -26,8 +32,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.VolumeOff
-import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -45,10 +49,13 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,6 +65,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ethersense.data.model.SignalMetrics
 import com.ethersense.data.model.WifiNetwork
 import com.ethersense.data.model.WifiStandard
+import com.ethersense.data.repository.AppLanguage
 import com.ethersense.ui.canvas.GlowingOrbView
 import com.ethersense.ui.canvas.WaveformVisualizer
 import com.ethersense.ui.components.MetricsGrid
@@ -70,6 +78,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -128,23 +137,6 @@ fun DashboardScreen(
                     }
                 },
                 actions = {
-                    IconButton(
-                        onClick = {
-                            viewModel.onEvent(
-                                DashboardEvent.ToggleAudio(!uiState.audioEnabled)
-                            )
-                        }
-                    ) {
-                        Icon(
-                            imageVector = if (uiState.audioEnabled) {
-                                Icons.Default.VolumeUp
-                            } else {
-                                Icons.Default.VolumeOff
-                            },
-                            contentDescription = "Toggle Audio",
-                            tint = if (uiState.audioEnabled) CyanPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
                     IconButton(onClick = onNavigateToSettings) {
                         Icon(
                             imageVector = Icons.Default.Settings,
@@ -168,13 +160,39 @@ fun DashboardScreen(
         },
         floatingActionButton = {
             if (uiState.hasPermission) {
+                var isRefreshing by remember { mutableStateOf(false) }
+                val infiniteTransition = rememberInfiniteTransition(label = "refresh")
+                val rotation by infiniteTransition.animateFloat(
+                    initialValue = 0f,
+                    targetValue = 360f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(1000, easing = LinearEasing)
+                    ),
+                    label = "rotation"
+                )
+
+                LaunchedEffect(isRefreshing) {
+                    if (isRefreshing) {
+                        delay(2000)
+                        isRefreshing = false
+                    }
+                }
+
                 FloatingActionButton(
-                    onClick = { viewModel.onEvent(DashboardEvent.TriggerScan) },
+                    onClick = {
+                        isRefreshing = true
+                        viewModel.onEvent(DashboardEvent.TriggerScan)
+                    },
                     containerColor = CyanPrimary
                 ) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
-                        contentDescription = "Scan"
+                        contentDescription = if (uiState.isJapanese) "再スキャン" else "Rescan",
+                        modifier = if (isRefreshing || uiState.isLoading) {
+                            Modifier.rotate(rotation)
+                        } else {
+                            Modifier
+                        }
                     )
                 }
             }
@@ -246,7 +264,7 @@ private fun DashboardContent(
                     ) {
                         CircularProgressIndicator(color = CyanPrimary)
                         Text(
-                            text = "Scanning for networks...",
+                            text = if (uiState.isJapanese) "ネットワークをスキャン中..." else "Scanning for networks...",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -257,7 +275,7 @@ private fun DashboardContent(
 
         if (uiState.currentMetrics != null) {
             item {
-                MetricsGrid(metrics = uiState.currentMetrics)
+                MetricsGrid(metrics = uiState.currentMetrics, isJapanese = uiState.isJapanese)
             }
         }
 
@@ -269,12 +287,12 @@ private fun DashboardContent(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Nearby Networks",
+                        text = if (uiState.isJapanese) "周辺ネットワーク" else "Nearby Networks",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
-                        text = "${uiState.networkCount} found",
+                        text = if (uiState.isJapanese) "${uiState.networkCount} 件検出" else "${uiState.networkCount} found",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

@@ -16,6 +16,7 @@
     <string name="no_networks">No networks found</string>
     <string name="scanning">Scanning...</string>
     <string name="connected">Connected</string>
+    <string name="nearby_networks">Nearby Networks</string>
 
     <!-- Permissions -->
     <string name="permission_required">Permission Required</string>
@@ -41,4 +42,58 @@
     <string name="sixth_sense_mode">Sixth Sense Mode</string>
     <string name="tap_to_start">Tap to start sensing</string>
     <string name="sensing_active">Sensing Active</string>
+
+    <!-- Speed Test -->
+    <string name="speed_test">Speed Test</string>
+    <string name="start_test">Start Test</string>
+    <string name="download">Download</string>
+    <string name="upload">Upload</string>
+    <string name="ping">Ping</string>
+    <string name="jitter">Jitter</string>
+    <string name="test_result">Test Result</string>
+    <string name="usage_recommendations">Usage Recommendations</string>
+    <string name="video_streaming">Video Streaming</string>
+    <string name="online_gaming">Online Gaming</string>
+    <string name="video_call">Video Call</string>
+
+    <!-- Connection Quality -->
+    <string name="connection_score">Connection Score</string>
+    <string name="excellent">Excellent</string>
+    <string name="good">Good</string>
+    <string name="fair">Fair</string>
+    <string name="poor">Poor</string>
+    <string name="weak">Weak</string>
+
+    <!-- Quality Levels -->
+    <string name="quality_4k">4K Ultra HD</string>
+    <string name="quality_fullhd">Full HD 1080p</string>
+    <string name="quality_hd">HD 720p</string>
+    <string name="quality_sd">SD 480p</string>
+    <string name="quality_low">Low Quality Only</string>
+
+    <!-- Gaming/Video Call -->
+    <string name="optimal">Optimal</string>
+    <string name="possible">Possible</string>
+    <string name="not_suitable">Not Suitable</string>
+    <string name="comfortable">Comfortable</string>
+    <string name="difficult">Difficult</string>
+
+    <!-- Navigation -->
+    <string name="nav_wifi">Wi-Fi</string>
+    <string name="nav_speed">Speed</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Errors -->
+    <string name="scan_throttled">Scan throttled. Please wait before scanning again.</string>
+    <string name="speed_test_failed">Speed test failed</string>
+    <string name="network_error">Network error</string>
+
+    <!-- Test Phases -->
+    <string name="phase_idle">Idle</string>
+    <string name="phase_connecting">Connecting...</string>
+    <string name="phase_ping">Measuring Ping...</string>
+    <string name="phase_download">Measuring Download...</string>
+    <string name="phase_upload">Measuring Upload...</string>
+    <string name="phase_completed">Completed</string>
+    <string name="phase_error">Error</string>
 </resources>

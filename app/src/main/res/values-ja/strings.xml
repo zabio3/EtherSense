@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">EtherSense</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">ダッシュボード</string>
+    <string name="signal_quality">信号品質</string>
+    <string name="link_speed">リンク速度</string>
+    <string name="throughput">推定スループット</string>
+    <string name="interference">干渉</string>
+    <string name="channel">チャンネル</string>
+    <string name="frequency">周波数</string>
+
+    <!-- Network List -->
+    <string name="networks_found">検出されたネットワーク</string>
+    <string name="no_networks">ネットワークが見つかりません</string>
+    <string name="scanning">スキャン中...</string>
+    <string name="connected">接続中</string>
+    <string name="nearby_networks">周辺ネットワーク</string>
+
+    <!-- Permissions -->
+    <string name="permission_required">権限が必要です</string>
+    <string name="location_permission_rationale">Wi-Fiネットワークをスキャンするには、位置情報の権限が必要です。これはAndroidシステムの要件です。</string>
+    <string name="grant_permission">権限を許可</string>
+    <string name="open_settings">設定を開く</string>
+
+    <!-- Settings -->
+    <string name="settings_title">設定</string>
+    <string name="audio_feedback">音声フィードバック</string>
+    <string name="audio_feedback_desc">信号強度に基づいたガイガーカウンター風の音声を有効にします</string>
+    <string name="haptic_feedback">触覚フィードバック</string>
+    <string name="haptic_feedback_desc">干渉検出時にバイブレーションします</string>
+    <string name="scan_interval">スキャン間隔</string>
+
+    <!-- Units -->
+    <string name="mbps">Mbps</string>
+    <string name="dbm">dBm</string>
+    <string name="mhz">MHz</string>
+    <string name="percent">%</string>
+
+    <!-- Sixth Sense -->
+    <string name="sixth_sense_mode">第六感モード</string>
+    <string name="tap_to_start">タップして開始</string>
+    <string name="sensing_active">センシング中</string>
+
+    <!-- Speed Test -->
+    <string name="speed_test">スピードテスト</string>
+    <string name="start_test">テスト開始</string>
+    <string name="download">ダウンロード</string>
+    <string name="upload">アップロード</string>
+    <string name="ping">Ping</string>
+    <string name="jitter">Jitter</string>
+    <string name="test_result">測定結果</string>
+    <string name="usage_recommendations">利用用途の目安</string>
+    <string name="video_streaming">動画ストリーミング</string>
+    <string name="online_gaming">オンラインゲーム</string>
+    <string name="video_call">ビデオ通話</string>
+
+    <!-- Connection Quality -->
+    <string name="connection_score">接続スコア</string>
+    <string name="excellent">優秀</string>
+    <string name="good">良好</string>
+    <string name="fair">普通</string>
+    <string name="poor">やや悪い</string>
+    <string name="weak">弱い</string>
+
+    <!-- Quality Levels -->
+    <string name="quality_4k">4K Ultra HD</string>
+    <string name="quality_fullhd">Full HD 1080p</string>
+    <string name="quality_hd">HD 720p</string>
+    <string name="quality_sd">SD 480p</string>
+    <string name="quality_low">低画質のみ</string>
+
+    <!-- Gaming/Video Call -->
+    <string name="optimal">最適</string>
+    <string name="possible">可能</string>
+    <string name="not_suitable">不向き</string>
+    <string name="comfortable">快適</string>
+    <string name="difficult">困難</string>
+
+    <!-- Navigation -->
+    <string name="nav_wifi">Wi-Fi</string>
+    <string name="nav_speed">速度</string>
+    <string name="nav_settings">設定</string>
+
+    <!-- Errors -->
+    <string name="scan_throttled">スキャンが制限されています。しばらくお待ちください。</string>
+    <string name="speed_test_failed">スピードテストに失敗しました</string>
+    <string name="network_error">ネットワークエラー</string>
+
+    <!-- Test Phases -->
+    <string name="phase_idle">待機中</string>
+    <string name="phase_connecting">接続中...</string>
+    <string name="phase_ping">Ping測定中...</string>
+    <string name="phase_download">ダウンロード測定中...</string>
+    <string name="phase_upload">アップロード測定中...</string>
+    <string name="phase_completed">完了</string>
+    <string name="phase_error">エラー</string>
+</resources>
