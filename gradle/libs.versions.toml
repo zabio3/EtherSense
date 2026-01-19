@@ -22,6 +22,12 @@ hiltNavigationCompose = "1.2.0"
 # Coroutines
 coroutines = "1.9.0"
 
+# DataStore
+datastore = "1.1.1"
+
+# OkHttp (Speed Test)
+okhttp = "4.12.0"
+
 # Accompanist
 accompanist = "0.36.0"
 
@@ -67,6 +73,12 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 
 # Accompanist
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
+
+# DataStore
+datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+
+# OkHttp
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }

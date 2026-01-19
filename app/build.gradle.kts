@@ -74,6 +74,12 @@ dependencies {
     // Accompanist (Permissions)
     implementation(libs.accompanist.permissions)
 
+    // DataStore
+    implementation(libs.datastore.preferences)
+
+    // OkHttp (Speed Test)
+    implementation(libs.okhttp)
+
     // Testing
     testImplementation(libs.bundles.testing)
     androidTestImplementation(libs.bundles.androidTesting)
