@@ -2,7 +2,9 @@
 
 Wi-Fiネットワーク診断アプリ
 
-![App Demo](docs/images/demo.gif)
+<p align="center">
+  <img src="docs/images/wifi.png" width="280" alt="EtherSense Wi-Fi Dashboard">
+</p>
 
 ## Features
 
@@ -32,10 +34,9 @@ Shannon-Hartley定理による理論上の最大通信容量と、IEEE 802.11 MC
 
 ## Screenshots
 
-<!-- スクリーンショットを追加してください -->
-| ダッシュボード | スピードテスト | 診断 |
+| スピードテスト | 診断 | 設定 |
 |:---:|:---:|:---:|
-| ![Dashboard](docs/images/dashboard.png) | ![Speed Test](docs/images/speedtest.png) | ![Diagnostics](docs/images/diagnostics.png) |
+| ![Speed Test](docs/images/speedtest.png) | ![Diagnostics](docs/images/diagnostics.png) | ![Settings](docs/images/settings.png) |
 
 ## Privacy
 
