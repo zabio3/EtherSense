@@ -3,6 +3,8 @@ package com.ethersense.presentation.dashboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ethersense.data.model.WifiNetwork
+import com.ethersense.data.repository.AppLanguage
+import com.ethersense.data.repository.SettingsRepository
 import com.ethersense.domain.analyzer.WifiAnalyzerEngine
 import com.ethersense.domain.usecase.ScanWifiNetworksUseCase
 import com.ethersense.feedback.FeedbackOrchestrator
@@ -20,25 +22,41 @@ import javax.inject.Inject
 class DashboardViewModel @Inject constructor(
     private val scanWifiNetworksUseCase: ScanWifiNetworksUseCase,
     private val wifiAnalyzerEngine: WifiAnalyzerEngine,
-    private val feedbackOrchestrator: FeedbackOrchestrator
+    private val feedbackOrchestrator: FeedbackOrchestrator,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
 
     private var scanJob: Job? = null
-    private var sixthSenseJob: Job? = null
     private val rssiHistory = mutableListOf<Int>()
+
+    init {
+        loadSettings()
+    }
+
+    private fun loadSettings() {
+        viewModelScope.launch {
+            settingsRepository.hapticEnabled.collect { enabled ->
+                _uiState.update { it.copy(hapticEnabled = enabled) }
+                feedbackOrchestrator.setHapticEnabled(enabled)
+            }
+        }
+        viewModelScope.launch {
+            settingsRepository.language.collect { language ->
+                _uiState.update { it.copy(language = language) }
+            }
+        }
+    }
 
     fun onEvent(event: DashboardEvent) {
         when (event) {
             is DashboardEvent.StartScanning -> startScanning()
             is DashboardEvent.StopScanning -> stopScanning()
             is DashboardEvent.TriggerScan -> triggerScan()
-            is DashboardEvent.ToggleAudio -> toggleAudio(event.enabled)
             is DashboardEvent.ToggleHaptic -> toggleHaptic(event.enabled)
-            is DashboardEvent.StartSixthSenseMode -> startSixthSenseMode()
-            is DashboardEvent.StopSixthSenseMode -> stopSixthSenseMode()
+            is DashboardEvent.ChangeLanguage -> changeLanguage(event.language)
             is DashboardEvent.SelectNetwork -> selectNetwork(event.network)
             is DashboardEvent.DismissError -> dismissError()
             is DashboardEvent.RequestPermission -> Unit
@@ -65,9 +83,14 @@ class DashboardViewModel @Inject constructor(
         scanJob = viewModelScope.launch {
             scanWifiNetworksUseCase()
                 .catch { e ->
+                    val errorMessage = if (_uiState.value.isJapanese) {
+                        e.message ?: "ネットワークのスキャンに失敗しました"
+                    } else {
+                        e.message ?: "Failed to scan networks"
+                    }
                     _uiState.update {
                         it.copy(
-                            error = e.message ?: "Failed to scan networks",
+                            error = errorMessage,
                             isLoading = false
                         )
                     }
@@ -88,8 +111,13 @@ class DashboardViewModel @Inject constructor(
     private fun triggerScan() {
         val success = scanWifiNetworksUseCase.triggerScan()
         if (!success) {
+            val errorMessage = if (_uiState.value.isJapanese) {
+                "スキャンが制限されています。しばらくお待ちください。"
+            } else {
+                "Scan throttled. Please wait before scanning again."
+            }
             _uiState.update {
-                it.copy(error = "Scan throttled. Please wait before scanning again.")
+                it.copy(error = errorMessage)
             }
         }
     }
@@ -117,7 +145,7 @@ class DashboardViewModel @Inject constructor(
         }
 
         metrics?.let { m ->
-            if (_uiState.value.audioEnabled || _uiState.value.hapticEnabled) {
+            if (_uiState.value.hapticEnabled) {
                 feedbackOrchestrator.provideFeedback(m)
             }
         }
@@ -130,27 +158,19 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
-    private fun toggleAudio(enabled: Boolean) {
-        _uiState.update { it.copy(audioEnabled = enabled) }
-        feedbackOrchestrator.setAudioEnabled(enabled)
-    }
-
     private fun toggleHaptic(enabled: Boolean) {
         _uiState.update { it.copy(hapticEnabled = enabled) }
         feedbackOrchestrator.setHapticEnabled(enabled)
-    }
-
-    private fun startSixthSenseMode() {
-        _uiState.update { it.copy(audioEnabled = true) }
-        feedbackOrchestrator.setAudioEnabled(true)
-
-        feedbackOrchestrator.startContinuousFeedback {
-            _uiState.value.currentMetrics
+        viewModelScope.launch {
+            settingsRepository.setHapticEnabled(enabled)
         }
     }
 
-    private fun stopSixthSenseMode() {
-        feedbackOrchestrator.stop()
+    private fun changeLanguage(language: AppLanguage) {
+        _uiState.update { it.copy(language = language) }
+        viewModelScope.launch {
+            settingsRepository.setLanguage(language)
+        }
     }
 
     private fun selectNetwork(network: WifiNetwork) {
