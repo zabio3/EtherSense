@@ -1,6 +1,6 @@
 # EtherSense
 
-A native Android Wi-Fi environment analyzer with "Sixth Sense" sensory feedback features. EtherSense goes beyond standard Wi-Fi analyzers by providing auditory, haptic, and visual feedback to help you intuitively understand your wireless environment.
+A native Android Wi-Fi environment analyzer with "Sixth Sense" sensory feedback features and scientifically-grounded network diagnostics. EtherSense goes beyond standard Wi-Fi analyzers by providing auditory, haptic, and visual feedback to help you intuitively understand your wireless environment.
 
 ## Features
 
@@ -9,6 +9,41 @@ A native Android Wi-Fi environment analyzer with "Sixth Sense" sensory feedback 
 - **Interference Detection**: Analyzes co-channel and adjacent channel interference from nearby access points
 - **Throughput Estimation**: Calculates real-world throughput using: `LinkSpeed x Quality x (1 - Interference) x 0.65`
 - **Channel Analysis**: Identifies channel congestion and recommends optimal channels
+- **Speed Test**: Measure actual download/upload speeds and latency
+
+### Scientific Network Diagnostics (NEW)
+Evidence-based network analysis using established wireless communication models:
+
+#### Distance Estimation (ITU-R P.1238)
+Estimates the distance to your router using the ITU indoor propagation model:
+```
+d = 10^((PathLoss - 20×log₁₀(f) + 28 - Pf(n)) / N)
+```
+- Supports multiple environment types (Residential, Office, Commercial, Open Space)
+- Shows confidence intervals and error margins
+
+#### Throughput Prediction (Shannon-Hartley + MCS)
+Predicts network throughput using Shannon capacity theorem and IEEE 802.11 MCS tables:
+```
+C = B × log₂(1 + SNR)
+```
+- Shannon theoretical capacity
+- MCS-based practical throughput (802.11ax/ac/n tables)
+- Real-world estimation with protocol overhead
+
+#### Link Margin Analysis
+Evaluates connection stability using link budget calculations:
+```
+LinkMargin = RSSI - ReceiverSensitivity
+```
+- Stability levels: Excellent (>20dB), Good (>12dB), Marginal (>6dB), Unstable
+- Fade margin assessment for connection reliability
+
+#### Signal Trend Prediction
+Analyzes RSSI history to predict future signal quality:
+- Moving average and variance analysis
+- Linear regression for trend direction
+- 5-second quality prediction with confidence
 
 ### "Sixth Sense" Features
 
@@ -44,21 +79,33 @@ EtherSense follows Clean Architecture principles with MVVM:
 ```
 app/
 ├── data/
-│   ├── model/          # Data classes (WifiNetwork, SignalMetrics)
+│   ├── model/          # Data classes (WifiNetwork, SignalMetrics, SpeedTestResult)
 │   ├── source/         # WifiScannerDataSource (BroadcastReceiver)
-│   └── repository/     # WifiRepository
+│   └── repository/     # WifiRepository, SpeedTestRepository, SettingsRepository
 ├── domain/
-│   ├── analyzer/       # WifiAnalyzerEngine, Calculators
-│   └── usecase/        # ScanWifiNetworks, AnalyzeNetwork
+│   ├── analyzer/       # Scientific analyzers
+│   │   ├── WifiAnalyzerEngine
+│   │   ├── SignalQualityCalculator
+│   │   ├── ChannelAnalyzer
+│   │   ├── ThroughputEstimator
+│   │   ├── DistanceEstimator         # ITU-R P.1238 model
+│   │   ├── ScientificThroughputPredictor  # Shannon + MCS
+│   │   ├── LinkMarginAnalyzer        # Link budget analysis
+│   │   ├── SignalPredictor           # Trend analysis
+│   │   └── NetworkDiagnosticsAnalyzer  # Orchestrator
+│   ├── model/          # NetworkDiagnostics, DistanceEstimate, etc.
+│   └── usecase/        # ScanWifiNetworks, AnalyzeNetwork, RunSpeedTest
 ├── presentation/
 │   ├── dashboard/      # Main screen with visualizations
+│   ├── speedtest/      # Speed test screen
+│   ├── diagnostics/    # Scientific diagnostics screen
 │   └── settings/       # Feedback toggles
 ├── feedback/
-│   ├── audio/          # AudioFeedbackManager (ToneGenerator)
-│   └── haptic/         # HapticFeedbackManager (Vibrator)
+│   └── FeedbackOrchestrator  # Audio & Haptic feedback
 └── ui/
     ├── theme/          # Dark futuristic theme
-    └── canvas/         # GlowingOrbView, WaveformVisualizer
+    ├── components/     # Reusable UI components
+    └── canvas/         # GlowingOrbView, WaveformVisualizer, RadarSweepView
 ```
 
 ## Technical Details
@@ -88,15 +135,74 @@ EstimatedThroughput = TheoreticalLinkSpeed × SignalQuality × (1 - Interference
 ```
 The 0.65 factor accounts for protocol overhead (~35%).
 
+### Scientific Diagnostics Models
+
+#### ITU-R P.1238 Indoor Propagation Model
+Used for distance estimation from RSSI:
+```
+PathLoss = 20×log₁₀(f) + N×log₁₀(d) + Pf(n) - 28
+
+Where:
+- f: Frequency (MHz)
+- d: Distance (m)
+- N: Path loss exponent (Residential=2.8, Office=3.0, Commercial=2.2)
+- Pf(n): Floor penetration loss factor
+```
+
+#### Shannon-Hartley Theorem
+Theoretical channel capacity:
+```
+C = B × log₂(1 + SNR)
+
+Where:
+- C: Channel capacity (bps)
+- B: Bandwidth (Hz)
+- SNR: Signal-to-noise ratio (linear)
+```
+
+#### MCS (Modulation and Coding Scheme) Tables
+802.11ax MCS requirements (1 spatial stream, 20 MHz):
+
+| MCS | Modulation | Min SNR | Data Rate |
+|-----|------------|---------|-----------|
+| 0 | BPSK 1/2 | 5 dB | 8.6 Mbps |
+| 5 | 64-QAM 2/3 | 20 dB | 68.8 Mbps |
+| 9 | 256-QAM 5/6 | 32 dB | 114.7 Mbps |
+| 11 | 1024-QAM 5/6 | 38 dB | 143.4 Mbps |
+
+#### Link Margin Stability Thresholds
+| Margin | Stability Level |
+|--------|-----------------|
+| ≥ 20 dB | Excellent (very stable) |
+| ≥ 12 dB | Good (stable) |
+| ≥ 6 dB | Marginal (may experience drops) |
+| < 6 dB | Unstable (frequent disconnections) |
+
+## App Navigation
+
+The app consists of four main screens accessible via bottom navigation:
+
+| Tab | Screen | Description |
+|-----|--------|-------------|
+| Wi-Fi | Dashboard | Real-time signal monitoring, nearby networks, visual feedback |
+| Speed | Speed Test | Download/upload speed measurement, latency testing |
+| Diagnose | Diagnostics | Scientific network analysis with detailed/simple modes |
+| Settings | Settings | Language, haptic feedback, and other preferences |
+
+The Diagnostics screen offers two display modes:
+- **Detailed Mode**: Shows all scientific data (formulas, MCS index, confidence levels)
+- **Simple Mode**: Quick overview with key metrics only
+
 ## Requirements
 
 - **Android SDK**: API 26+ (Android 8.0 Oreo)
-- **Target SDK**: API 34 (Android 14)
+- **Target SDK**: API 35 (Android 15)
 - **Permissions**:
   - `ACCESS_FINE_LOCATION` - Required for Wi-Fi scanning
   - `ACCESS_WIFI_STATE` - Read Wi-Fi information
   - `CHANGE_WIFI_STATE` - Trigger Wi-Fi scans
   - `VIBRATE` - Haptic feedback
+  - `INTERNET` - Speed test functionality
 
 ## Building
 
@@ -133,6 +239,15 @@ EtherSense does not:
 - Track usage analytics
 
 All processing happens locally on your device.
+
+## Scientific References
+
+The network diagnostics features are based on established wireless communication research:
+
+- **ITU-R P.1238**: [Propagation data and prediction methods for the planning of indoor radiocommunication systems](https://www.itu.int/rec/R-REC-P.1238)
+- **Shannon-Hartley Theorem**: [Channel Capacity (Wikipedia)](https://en.wikipedia.org/wiki/Shannon–Hartley_theorem)
+- **MCS Index Tables**: [MCS Index (mcsindex.com)](https://mcsindex.com/)
+- **Link Budget Calculation**: [RF Link Budget Guide (Cadence)](https://resources.system-analysis.cadence.com/blog/rf-link-budget-calculation-guide)
 
 ## License
 
