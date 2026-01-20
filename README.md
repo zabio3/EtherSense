@@ -28,6 +28,32 @@ Calculates link margin from the difference between receiver sensitivity and RSSI
 #### Signal Trend Prediction
 Uses moving averages and linear regression on historical RSSI data to predict near-future signal quality.
 
+### Network Tools
+
+#### Ping
+Test network connectivity with configurable packet count. Displays RTT statistics including min, average, max, and jitter.
+
+#### DNS Lookup
+Query DNS records for domains. Supports A, AAAA, CNAME, MX, NS, TXT, and other record types.
+
+#### Whois
+Retrieve domain registration information including registrar, creation date, and expiration.
+
+#### Wake on LAN
+Send magic packets to remotely wake devices on your local network.
+
+#### Port Scanner
+Scan target hosts to check which ports are open or closed.
+
+#### LAN Scanner
+Discover devices connected to your local network, showing IP address, hostname, and MAC address.
+
+#### Service Discovery
+Find services on your network using mDNS/Bonjour and UPnP/SSDP protocols.
+
+#### Network Info
+View current network configuration including IP address, gateway, subnet mask, and DNS servers.
+
 ## Download
 
 Download the APK from [GitHub Releases](https://github.com/zabio3/EtherSense/releases).
