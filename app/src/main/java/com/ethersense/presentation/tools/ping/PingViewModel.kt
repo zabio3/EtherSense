@@ -79,8 +79,9 @@ class PingViewModel @Inject constructor(
 
         pingJob = viewModelScope.launch {
             val progressList = mutableListOf<PingProgress>()
+            val count = _uiState.value.count
 
-            pingUseCase(host, _uiState.value.count)
+            pingUseCase(host, count)
                 .catch { e ->
                     _uiState.value = _uiState.value.copy(
                         error = e.message,
@@ -88,8 +89,8 @@ class PingViewModel @Inject constructor(
                     )
                 }
                 .onCompletion {
-                    // Get final result
-                    val result = pingUseCase.executeAndGetResult(host, _uiState.value.count)
+                    // Calculate final result from collected progress data
+                    val result = calculateResultFromProgress(host, progressList, count)
                     _uiState.value = _uiState.value.copy(
                         result = result,
                         isRunning = false
@@ -112,6 +113,43 @@ class PingViewModel @Inject constructor(
             progressList = emptyList(),
             result = null,
             error = null
+        )
+    }
+
+    private fun calculateResultFromProgress(
+        host: String,
+        progressList: List<PingProgress>,
+        count: Int
+    ): PingResult {
+        if (progressList.isEmpty()) {
+            return PingResult(
+                host = host,
+                ipAddress = "",
+                rttMin = 0f,
+                rttAvg = 0f,
+                rttMax = 0f,
+                packetLoss = 100f,
+                packetsTransmitted = count,
+                packetsReceived = 0,
+                isSuccess = false,
+                errorMessage = "No response received"
+            )
+        }
+
+        val rttValues = progressList.map { it.rtt }
+        val packetsReceived = progressList.size
+        val packetLoss = ((count - packetsReceived).toFloat() / count) * 100f
+
+        return PingResult(
+            host = host,
+            ipAddress = progressList.firstOrNull()?.host ?: "",
+            rttMin = rttValues.minOrNull() ?: 0f,
+            rttAvg = rttValues.average().toFloat(),
+            rttMax = rttValues.maxOrNull() ?: 0f,
+            packetLoss = packetLoss,
+            packetsTransmitted = count,
+            packetsReceived = packetsReceived,
+            isSuccess = packetsReceived > 0
         )
     }
 

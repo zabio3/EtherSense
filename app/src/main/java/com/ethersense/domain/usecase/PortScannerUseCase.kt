@@ -12,7 +12,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import java.net.InetSocketAddress
+import java.net.NoRouteToHostException
 import java.net.Socket
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 class PortScannerUseCase @Inject constructor() {
@@ -133,7 +135,32 @@ class PortScannerUseCase @Inject constructor() {
                 status = PortStatus.CLOSED,
                 serviceName = CommonPorts.getServiceName(port)
             )
+        } catch (e: NoRouteToHostException) {
+            // Host is unreachable - different from filtered
+            PortScanResult(
+                host = host,
+                port = port,
+                status = PortStatus.FILTERED,
+                serviceName = CommonPorts.getServiceName(port)
+            )
+        } catch (e: UnknownHostException) {
+            // Cannot resolve hostname - treat as closed since host doesn't exist
+            PortScanResult(
+                host = host,
+                port = port,
+                status = PortStatus.CLOSED,
+                serviceName = CommonPorts.getServiceName(port)
+            )
+        } catch (e: SecurityException) {
+            // Permission denied
+            PortScanResult(
+                host = host,
+                port = port,
+                status = PortStatus.FILTERED,
+                serviceName = CommonPorts.getServiceName(port)
+            )
         } catch (e: Exception) {
+            // Other network errors - treat as filtered
             PortScanResult(
                 host = host,
                 port = port,

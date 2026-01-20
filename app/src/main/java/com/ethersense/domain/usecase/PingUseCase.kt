@@ -16,30 +16,37 @@ class PingUseCase @Inject constructor() {
         val process = Runtime.getRuntime().exec(arrayOf("ping", "-c", count.toString(), host))
         val reader = BufferedReader(InputStreamReader(process.inputStream))
 
-        var line: String?
-        var sequenceNumber = 0
+        try {
+            var line: String?
+            var sequenceNumber = 0
 
-        while (reader.readLine().also { line = it } != null) {
-            line?.let { parseLine ->
-                parsePingLine(parseLine, host)?.let { progress ->
-                    sequenceNumber++
-                    emit(progress.copy(sequenceNumber = sequenceNumber))
+            while (reader.readLine().also { line = it } != null) {
+                line?.let { parseLine ->
+                    parsePingLine(parseLine, host)?.let { progress ->
+                        sequenceNumber++
+                        emit(progress.copy(sequenceNumber = sequenceNumber))
+                    }
                 }
             }
+        } finally {
+            process.waitFor()
+            reader.close()
         }
-
-        reader.close()
-        process.waitFor()
     }.flowOn(Dispatchers.IO)
 
     suspend fun executeAndGetResult(host: String, count: Int = 4): PingResult {
         return try {
             val process = Runtime.getRuntime().exec(arrayOf("ping", "-c", count.toString(), host))
             val reader = BufferedReader(InputStreamReader(process.inputStream))
-            val output = reader.readText()
-            reader.close()
 
-            val exitCode = process.waitFor()
+            val output: String
+            val exitCode: Int
+            try {
+                output = reader.readText()
+                exitCode = process.waitFor()
+            } finally {
+                reader.close()
+            }
 
             if (exitCode == 0) {
                 parsePingOutput(host, output)

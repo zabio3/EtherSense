@@ -10,18 +10,37 @@ import javax.inject.Inject
 
 class DnsLookupUseCase @Inject constructor() {
 
+    companion object {
+        private val SUPPORTED_TYPES = setOf(
+            DnsRecordType.A,
+            DnsRecordType.AAAA,
+            DnsRecordType.PTR
+        )
+    }
+
     suspend operator fun invoke(
         domain: String,
         recordType: DnsRecordType = DnsRecordType.A
     ): DnsLookupResult = withContext(Dispatchers.IO) {
         val startTime = System.currentTimeMillis()
 
+        // Check if record type is supported
+        if (recordType !in SUPPORTED_TYPES) {
+            return@withContext DnsLookupResult(
+                domain = domain,
+                records = emptyList(),
+                queryTime = System.currentTimeMillis() - startTime,
+                isSuccess = false,
+                errorMessage = "${recordType.displayName} lookup is not supported. Only A, AAAA, and PTR records are available."
+            )
+        }
+
         try {
             val records = when (recordType) {
                 DnsRecordType.A -> lookupA(domain)
                 DnsRecordType.AAAA -> lookupAAAA(domain)
                 DnsRecordType.PTR -> lookupPTR(domain)
-                else -> lookupA(domain) // Fallback to A record for unsupported types
+                else -> emptyList()
             }
 
             val queryTime = System.currentTimeMillis() - startTime
@@ -30,7 +49,8 @@ class DnsLookupUseCase @Inject constructor() {
                 domain = domain,
                 records = records,
                 queryTime = queryTime,
-                isSuccess = records.isNotEmpty()
+                isSuccess = records.isNotEmpty(),
+                errorMessage = if (records.isEmpty()) "No records found" else null
             )
         } catch (e: Exception) {
             DnsLookupResult(

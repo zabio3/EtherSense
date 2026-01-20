@@ -5,7 +5,9 @@ import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.Network
 import android.net.NetworkCapabilities
+import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
+import android.os.Build
 import com.ethersense.data.model.NetworkInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -32,8 +34,8 @@ class NetworkInfoDataSource @Inject constructor(
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     }
 
+    @Suppress("DEPRECATION")
     suspend fun getNetworkInfo(): NetworkInfo = withContext(Dispatchers.IO) {
-        val wifiInfo = wifiManager.connectionInfo
         val activeNetwork = connectivityManager.activeNetwork
         val capabilities = activeNetwork?.let { connectivityManager.getNetworkCapabilities(it) }
         val linkProperties = activeNetwork?.let { connectivityManager.getLinkProperties(it) }
@@ -41,7 +43,18 @@ class NetworkInfoDataSource @Inject constructor(
         val isWifiConnected = capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
         val isCellularConnected = capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true
 
-        val localIp = getLocalIpAddress()
+        // Get WifiInfo - use TransportInfo on API 31+, fallback to deprecated method
+        val wifiInfo: WifiInfo? = if (isWifiConnected) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                // On Android 12+, try to get WifiInfo from NetworkCapabilities
+                (capabilities?.transportInfo as? WifiInfo)
+                    ?: wifiManager.connectionInfo // Fallback to deprecated method
+            } else {
+                wifiManager.connectionInfo
+            }
+        } else null
+
+        val localIp = getLocalIpAddress(linkProperties)
         val gateway = getGatewayAddress(linkProperties)
         val dnsServers = getDnsServers(linkProperties)
         val subnetMask = getSubnetMask(linkProperties)
@@ -69,16 +82,24 @@ class NetworkInfoDataSource @Inject constructor(
         )
     }
 
-    private fun getLocalIpAddress(): String? {
+    @Suppress("DEPRECATION")
+    private fun getLocalIpAddress(linkProperties: LinkProperties?): String? {
         try {
-            // Try WifiManager first for Wi-Fi connection
+            // Try LinkProperties first (preferred on newer APIs)
+            linkProperties?.linkAddresses?.forEach { linkAddress ->
+                if (linkAddress.address is Inet4Address && !linkAddress.address.isLoopbackAddress) {
+                    return linkAddress.address.hostAddress
+                }
+            }
+
+            // Fallback to WifiManager (deprecated on API 31+)
             val wifiInfo = wifiManager.connectionInfo
             val ipInt = wifiInfo?.ipAddress ?: 0
             if (ipInt != 0) {
                 return intToIpAddress(ipInt)
             }
 
-            // Fallback to NetworkInterface
+            // Final fallback to NetworkInterface
             NetworkInterface.getNetworkInterfaces()?.toList()?.forEach { networkInterface ->
                 networkInterface.inetAddresses?.toList()?.forEach { address ->
                     if (!address.isLoopbackAddress && address is Inet4Address) {

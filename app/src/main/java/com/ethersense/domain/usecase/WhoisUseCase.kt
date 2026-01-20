@@ -8,6 +8,7 @@ import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
+import java.net.InetSocketAddress
 import java.net.Socket
 import javax.inject.Inject
 
@@ -94,7 +95,8 @@ class WhoisUseCase @Inject constructor() {
     }
 
     private fun performWhoisQuery(query: String, server: String): String {
-        Socket(server, WHOIS_PORT).use { socket ->
+        Socket().use { socket ->
+            socket.connect(InetSocketAddress(server, WHOIS_PORT), TIMEOUT_MS)
             socket.soTimeout = TIMEOUT_MS
 
             val writer = OutputStreamWriter(socket.getOutputStream())

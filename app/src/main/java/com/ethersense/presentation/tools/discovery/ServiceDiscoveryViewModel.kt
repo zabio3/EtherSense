@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -74,10 +75,23 @@ class ServiceDiscoveryViewModel @Inject constructor(
         discoveryJob = viewModelScope.launch {
             when (_uiState.value.selectedProtocol) {
                 DiscoveryProtocol.ALL -> {
+                    var mdnsCompleted = false
+                    var ssdpCompleted = false
+
+                    fun checkCompletion() {
+                        if (mdnsCompleted && ssdpCompleted) {
+                            _uiState.value = _uiState.value.copy(isDiscovering = false)
+                        }
+                    }
+
                     // Run both discoveries
                     launch {
                         nsdServiceDiscovery.discoverAllCommonServices()
                             .catch { /* Ignore errors, continue with other protocol */ }
+                            .onCompletion {
+                                mdnsCompleted = true
+                                checkCompletion()
+                            }
                             .collect { service ->
                                 if (!services.any { it.name == service.name && it.host == service.host }) {
                                     services.add(service)
@@ -91,6 +105,10 @@ class ServiceDiscoveryViewModel @Inject constructor(
                     launch {
                         ssdpDiscovery.discover()
                             .catch { /* Ignore errors */ }
+                            .onCompletion {
+                                ssdpCompleted = true
+                                checkCompletion()
+                            }
                             .collect { service ->
                                 if (!services.any { it.name == service.name && it.host == service.host }) {
                                     services.add(service)
@@ -106,6 +124,9 @@ class ServiceDiscoveryViewModel @Inject constructor(
                         .catch { e ->
                             _uiState.value = _uiState.value.copy(error = e.message)
                         }
+                        .onCompletion {
+                            _uiState.value = _uiState.value.copy(isDiscovering = false)
+                        }
                         .collect { service ->
                             if (!services.any { it.name == service.name && it.host == service.host }) {
                                 services.add(service)
@@ -119,6 +140,9 @@ class ServiceDiscoveryViewModel @Inject constructor(
                     ssdpDiscovery.discover()
                         .catch { e ->
                             _uiState.value = _uiState.value.copy(error = e.message)
+                        }
+                        .onCompletion {
+                            _uiState.value = _uiState.value.copy(isDiscovering = false)
                         }
                         .collect { service ->
                             if (!services.any { it.name == service.name && it.host == service.host }) {
