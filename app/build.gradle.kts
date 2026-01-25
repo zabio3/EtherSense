@@ -6,6 +6,31 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+fun getVersionName(): String {
+    return try {
+        val process = ProcessBuilder("git", "describe", "--tags", "--abbrev=0")
+            .directory(rootDir)
+            .redirectErrorStream(true)
+            .start()
+        process.inputStream.bufferedReader().readText().trim().removePrefix("v")
+    } catch (e: Exception) {
+        "1.0.0"
+    }
+}
+
+fun getVersionCode(): Int {
+    return try {
+        val process = ProcessBuilder("git", "tag", "--list", "v*")
+            .directory(rootDir)
+            .redirectErrorStream(true)
+            .start()
+        val tags = process.inputStream.bufferedReader().readText().trim().lines().filter { it.isNotEmpty() }
+        tags.size.coerceAtLeast(1)
+    } catch (e: Exception) {
+        1
+    }
+}
+
 android {
     namespace = "com.ethersense"
     compileSdk = 35
@@ -14,8 +39,8 @@ android {
         applicationId = "com.ethersense"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.2.1"
+        versionCode = getVersionCode()
+        versionName = getVersionName()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
