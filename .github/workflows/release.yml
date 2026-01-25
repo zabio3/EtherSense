@@ -31,13 +31,13 @@ jobs:
         run: |
           echo "$KEYSTORE_BASE64" | base64 --decode > ${{ github.workspace }}/keystore.jks
 
-      - name: Build Release APK
+      - name: Build Release AAB and APK
         env:
           KEYSTORE_PATH: ${{ github.workspace }}/keystore.jks
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew assembleRelease
+        run: ./gradlew bundleRelease assembleRelease
 
       - name: Get version from tag
         id: get_version
@@ -49,6 +49,8 @@ jobs:
           name: Release ${{ steps.get_version.outputs.VERSION }}
           draft: false
           prerelease: false
-          files: app/build/outputs/apk/release/app-release.apk
+          files: |
+            app/build/outputs/bundle/release/app-release.aab
+            app/build/outputs/apk/release/app-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
