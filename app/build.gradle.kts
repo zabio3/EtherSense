@@ -6,30 +6,17 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
-fun getVersionName(): String {
-    return try {
-        val process = ProcessBuilder("git", "describe", "--tags", "--abbrev=0")
-            .directory(rootDir)
-            .redirectErrorStream(true)
-            .start()
-        process.inputStream.bufferedReader().readText().trim().removePrefix("v")
-    } catch (e: Exception) {
-        "1.0.0"
-    }
-}
+val versionNameFromEnv: String = System.getenv("VERSION_NAME")
+    ?: providers.exec {
+        commandLine("git", "describe", "--tags", "--abbrev=0")
+    }.standardOutput.asText.map { it.trim().removePrefix("v") }.getOrElse("1.0.0")
 
-fun getVersionCode(): Int {
-    return try {
-        val process = ProcessBuilder("git", "tag", "--list", "v*")
-            .directory(rootDir)
-            .redirectErrorStream(true)
-            .start()
-        val tags = process.inputStream.bufferedReader().readText().trim().lines().filter { it.isNotEmpty() }
-        tags.size.coerceAtLeast(1)
-    } catch (e: Exception) {
-        1
-    }
-}
+val versionCodeFromEnv: Int = System.getenv("VERSION_CODE")?.toIntOrNull()
+    ?: providers.exec {
+        commandLine("git", "tag", "--list", "v*")
+    }.standardOutput.asText.map { text ->
+        text.trim().lines().filter { it.isNotEmpty() }.size.coerceAtLeast(1)
+    }.getOrElse(1)
 
 android {
     namespace = "com.ethersense"
@@ -39,8 +26,8 @@ android {
         applicationId = "com.ethersense"
         minSdk = 26
         targetSdk = 35
-        versionCode = getVersionCode()
-        versionName = getVersionName()
+        versionCode = versionCodeFromEnv
+        versionName = versionNameFromEnv
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
