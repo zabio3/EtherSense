@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Full square background (no transparency) -->
+  <rect width="512" height="512" fill="#0D0D1A"/>
+
+  <!-- Outer signal ring -->
+  <circle cx="256" cy="256" r="166" fill="none" stroke="#00D9FF" stroke-width="10"/>
+
+  <!-- Middle signal ring -->
+  <circle cx="256" cy="256" r="118" fill="none" stroke="#00D9FF" stroke-width="10" opacity="0.7"/>
+
+  <!-- Inner signal ring -->
+  <circle cx="256" cy="256" r="70" fill="none" stroke="#00D9FF" stroke-width="10" opacity="0.5"/>
+
+  <!-- Center dot -->
+  <circle cx="256" cy="256" r="24" fill="#00D9FF"/>
+</svg>
