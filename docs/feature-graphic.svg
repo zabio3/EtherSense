@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0D0D1A"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="500" fill="url(#bg)"/>
+
+  <!-- Signal rings (left side) -->
+  <circle cx="200" cy="250" r="120" fill="none" stroke="#00D9FF" stroke-width="6" opacity="0.3"/>
+  <circle cx="200" cy="250" r="85" fill="none" stroke="#00D9FF" stroke-width="6" opacity="0.5"/>
+  <circle cx="200" cy="250" r="50" fill="none" stroke="#00D9FF" stroke-width="6" opacity="0.7"/>
+  <circle cx="200" cy="250" r="18" fill="#00D9FF"/>
+
+  <!-- App name -->
+  <text x="380" y="220" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="#FFFFFF">EtherSense</text>
+
+  <!-- Tagline -->
+  <text x="380" y="290" font-family="Arial, sans-serif" font-size="32" fill="#00D9FF">Wi-Fi Network Analyzer</text>
+
+  <!-- Features -->
+  <text x="380" y="360" font-family="Arial, sans-serif" font-size="20" fill="#888888">Signal Monitoring • Speed Test • Network Diagnostics</text>
+</svg>
